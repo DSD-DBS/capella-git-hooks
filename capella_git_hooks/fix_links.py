@@ -97,7 +97,7 @@ def commit_changes(changed_files_to_be_committed: list[str]):
     )
 
 
-if __name__ == "__main__":
+def main():
     tracked_unmodified_files = get_unmodified_tracked_files()
     changed_files = []
     for file in tracked_unmodified_files:
@@ -107,3 +107,7 @@ if __name__ == "__main__":
 
     if changed_files:
         commit_changes(changed_files)
+
+
+if __name__ == "__main__":
+    main()
