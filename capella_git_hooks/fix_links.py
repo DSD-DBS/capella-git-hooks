@@ -98,6 +98,7 @@ def commit_changes(changed_files_to_be_committed: list[str]):
 
 
 def main():
+    """Fix links in all tracked, unchanged files and commit the changes."""
     tracked_unmodified_files = get_unmodified_tracked_files()
     changed_files = []
     for file in tracked_unmodified_files:
