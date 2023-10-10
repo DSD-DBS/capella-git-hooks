@@ -11,7 +11,7 @@ dynamic = ["version"]
 name = "capella-git-hooks"
 description = "A collection of useful Capella related Git hooks"
 readme = "README.md"
-requires-python = ">=3.0, <3.12"
+requires-python = ">=3.9, <3.12"
 license = { text = "Apache-2.0" }
 authors = [
   { name = "DB Netz AG" },
@@ -23,7 +23,7 @@ classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.0",
+  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
 ]
@@ -78,7 +78,7 @@ no_implicit_optional = true
 show_error_codes = true
 warn_redundant_casts = true
 warn_unreachable = true
-python_version = "3.0"
+python_version = "3.9"
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
