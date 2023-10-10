@@ -27,7 +27,9 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
 ]
-dependencies = []
+dependencies = [
+  "capellambse"
+]
 
 [project.urls]
 Homepage = "https://github.com/DSD-DBS/capella-git-hooks"
@@ -48,7 +50,7 @@ test = [
 
 [tool.black]
 line-length = 79
-target-version = ["py30"]
+target-version = ["py39"]
 
 [tool.coverage.run]
 branch = true
