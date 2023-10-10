@@ -8,19 +8,37 @@
 ![image](https://github.com/DSD-DBS/capella-git-hooks/actions/workflows/build-test-publish.yml/badge.svg)
 ![image](https://github.com/DSD-DBS/capella-git-hooks/actions/workflows/lint.yml/badge.svg)
 
-A collection of useful Capella related Git hooks
-
-# Documentation
-
-Read the [full documentation on Github pages](https://dsd-dbs.github.io/capella-git-hooks).
-
-# Installation
-
-You can install the latest released version directly from PyPI.
-
-```sh
-pip install capella-git-hooks
+In this repository we provide git hooks, which can be useful when using git for storing Capella models.
+All hooks are designed to be included using the [pre-commit framework](https://pre-commit.com/).
+To include git a git hook from this repository, you have to add a `.pre-commit-config.yaml` file to the root of your repository.
+In this file you have to reference this repository to use hooks from here:
+```yaml
+repos:
+  - repo: https://github.com/DSD-DBS/capella-git-hooks.git
+    rev: 862cf641c298f9666656b46b1bde3639c7592b01
+    hooks:
+      - id: ...
 ```
+# Available Hooks
+In the following we will shortly summarize the available hooks and how to include them.
+## fix-links
+This post-commit hook is a workaround, which checks all files for broken links starting with `index:/`.
+These can occur after using the merge tool as described in this [issue](https://github.com/eclipse/capella/issues/2725).
+The general process looks as follows:
+1. Get all git tracked files not having uncommitted changes (as it is a post-commit hook, this includes changes committed in the triggering git command)
+2. Search and replace `index:/` in all XML attributes - we ensure that the XML-structure does not change
+3. If files were changed, these are written to disk and committed in a separate commit using a predefined commit message ("fix[by-script]: merge tool index-prefix")
+
+To use this hook add `fix-links` to the list of hooks in your `.pre-commit-config.yaml`.
+```yaml
+repos:
+  - repo: https://github.com/DSD-DBS/capella-git-hooks.git
+    rev: 862cf641c298f9666656b46b1bde3639c7592b01
+    hooks:
+      - id: fix-links
+```
+
+# Setting up a Development Environment
 
 To set up a development environment, clone the project and install it into a
 virtual environment.
