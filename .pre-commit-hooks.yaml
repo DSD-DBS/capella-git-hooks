@@ -1,0 +1,6 @@
+-   id: fix-links
+    name: fix links after breaking merge
+    description: After a breaking merge by the merge tool, this script fixes links starting with index:/.
+    entry: fix-links
+    language: python
+    stages: [post-commit]

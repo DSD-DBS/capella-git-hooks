@@ -31,6 +31,9 @@ dependencies = [
   "capellambse"
 ]
 
+[project.scripts]
+fix-links = "capella_git_hooks:fix_links"
+
 [project.urls]
 Homepage = "https://github.com/DSD-DBS/capella-git-hooks"
 Documentation = "https://dsd-dbs.github.io/capella-git-hooks"
