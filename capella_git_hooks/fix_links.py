@@ -12,6 +12,7 @@ import sys
 from capellambse.loader import exs
 from lxml import etree as ET
 
+# pylint: disable=line-too-long
 root_pattern = re.compile(
     r"(index:/).*\.(capella|aird)#[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}"
 )
@@ -88,9 +89,9 @@ def fix_xml(path: str) -> bool:
     return changed
 
 
-def commit_changes(changed_files: list[str]):
+def commit_changes(changed_files_to_be_committed: list[str]):
     """Add and commit the provided list of files using a predefined message."""
-    subprocess.call(["git", "add"] + changed_files)
+    subprocess.call(["git", "add"] + changed_files_to_be_committed)
     subprocess.call(
         ["git", "commit", "-m", "fix[by-script]: merge tool index-prefix"]
     )
