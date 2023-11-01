@@ -4,6 +4,8 @@
 
 See https://github.com/eclipse/capella/issues/2725 for more information.
 """
+from __future__ import annotations
+
 import os
 import re
 import subprocess
@@ -57,6 +59,7 @@ def get_unmodified_tracked_files() -> list[str]:
 def search_and_replace(
     pattern: re.Pattern, value: str, replacement: str
 ) -> str | None:
+    """Return the patched value or the unpatched value."""
     while match := pattern.search(value):
         index_match = match.span(1)
         value = value[: index_match[0]] + replacement + value[index_match[1] :]
@@ -66,6 +69,7 @@ def search_and_replace(
 def fix_semantic_resources(
     root: ET._Element, root_repl: str, fragment_repl: str
 ) -> bool:
+    """Patch the semantic resource file paths and return a bool."""
     changed = False
     danalysis = next(root.iterchildren(DIAGRAM_OVERVIEW_TAG))
     for resource in danalysis.iterchildren("semanticResources"):
