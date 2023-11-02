@@ -27,7 +27,7 @@ root_reference_pattern = re.compile(
 )
 
 fragment_pattern = re.compile(
-    rf"{prefix_pattern}fragments/.*\.(capella|aird)fragment"
+    rf"({prefix_pattern}fragments/).*\.(capella|aird)fragment"
 )
 fragment_reference_pattern = re.compile(
     f"{fragment_pattern.pattern}{reference_pattern.pattern}"
@@ -72,14 +72,24 @@ def fix_semantic_resources(
     """Patch the semantic resource file paths and return a bool."""
     changed = False
     danalysis = next(root.iterchildren(DIAGRAM_OVERVIEW_TAG))
+    is_fragment = "fragments" in root.base
     for resource in danalysis.iterchildren("semanticResources"):
-        if resource.text is None:
+        if not resource.text or root.base in resource.text:
+            danalysis.remove(resource)
+            changed = True
             continue
 
         text = search_and_replace(
             fragment_pattern, resource.text, fragment_repl
         )
-        text = search_and_replace(root_pattern, resource.text, root_repl)
+        if resource.text == text:
+            replacement = fragment_repl if is_fragment else root_repl
+            text = search_and_replace(root_pattern, resource.text, replacement)
+
+        if is_fragment and not resource.text.endswith("fragment"):
+            if not resource.text.startswith(root_repl):
+                text = f"{root_repl}{resource.text}"
+
         if resource.text != text:
             resource.text = text
             changed = True
