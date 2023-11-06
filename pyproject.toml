@@ -88,15 +88,8 @@ python_version = "3.9"
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
-allow_incomplete_defs = true
-allow_untyped_defs = true
-
-[[tool.mypy.overrides]]
-# Untyped third party libraries
-module = [
-  # ...
-]
-ignore_missing_imports = true
+disallow_incomplete_defs = false
+disallow_untyped_defs = false
 
 [tool.pydocstyle]
 convention = "numpy"

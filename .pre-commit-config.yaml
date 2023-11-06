@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: CC0-1.0
 
 default_install_hook_types: [commit-msg, pre-commit]
-default_stages: [commit, merge-commit]
+default_stages: [pre-commit, pre-merge-commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-ast
@@ -26,15 +26,15 @@ repos:
       - id: fix-byte-order-marker
       - id: trailing-whitespace
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.9.1
+    rev: 24.10.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.5
+    rev: eb1df347edd128b30cd3368dddc3aa65edcfac38
     hooks:
       - id: docformatter
         additional_dependencies:
@@ -47,11 +47,11 @@ repos:
         additional_dependencies:
           - pydocstyle[toml]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
+    rev: v1.13.0
     hooks:
       - id: mypy
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.4.2
+    rev: v1.5.5
     hooks:
       - id: insert-license
         name: Insert license headers (shell-style comments)
@@ -94,10 +94,10 @@ repos:
           - --comment-style
           - '..|  |'
   - repo: https://github.com/fsfe/reuse-tool
-    rev: v2.1.0
+    rev: v5.0.2
     hooks:
       - id: reuse
   - repo: https://github.com/qoomon/git-conventional-commits
-    rev: v2.6.5
+    rev: v2.6.7
     hooks:
       - id: conventional-commits
