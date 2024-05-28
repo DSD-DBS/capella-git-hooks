@@ -11,7 +11,7 @@ dynamic = ["version"]
 name = "capella-git-hooks"
 description = "A collection of useful Capella related Git hooks"
 readme = "README.md"
-requires-python = ">=3.9, <3.12"
+requires-python = ">=3.9"
 license = { text = "Apache-2.0" }
 authors = [
   { name = "DB Netz AG" },
