@@ -21,6 +21,7 @@ import urllib.parse
 
 import click
 from capellambse import filehandler, helpers, loader
+from lxml import etree
 
 LOGGER = logging.getLogger(__name__)
 # FIXME This isn't conventional-commits compliant, and might fail checks
@@ -125,10 +126,16 @@ def fix_model(model: loader.MelodyLoader) -> bool:
         True if the model was modified, False otherwise.
     """
     dirty = False
+    marked_for_deletion: list[etree._Element] = []
     for element in model.iterall():
+        try:
+            sourcefrag = model.find_fragment(element)
+        except ValueError:
+            continue
+
         if element.tag == "semanticResources":
             if element.text == "":
-                element.getparent().remove(element)
+                marked_for_deletion.append(element)
                 continue
 
             targetfrag = urllib.parse.unquote(element.text.rsplit("/", 1)[-1])
@@ -140,9 +147,8 @@ def fix_model(model: loader.MelodyLoader) -> bool:
                     " https://github.com/DSD-DBS/capella-git-hooks"
                 )
 
-            sourcefrag = model.find_fragment(element)
             if sourcefrag == frags[0]:
-                element.getparent().remove(element)
+                marked_for_deletion.append(element)
                 continue
 
             link = os.path.relpath(frags[0], sourcefrag.parent)
@@ -164,11 +170,22 @@ def fix_model(model: loader.MelodyLoader) -> bool:
 
             new_links: list[str] = []
             for link in links:
-                _, _, target_id = link.partition("#")
+                start, _, target_id = link.partition("#")
                 try:
                     target = model.follow_link(None, target_id)
                 except KeyError:
-                    LOGGER.error("Cannot repair dangling link: #%s", target_id)
+                    if (
+                        element.tag == "ownedRepresentationDescriptors"
+                        and start.startswith("cdo://")
+                    ):
+                        ft = model.trees[sourcefrag].fragment_type
+                        if ft == loader.FragmentType.VISUAL:
+                            marked_for_deletion.append(element)
+                            continue
+                    else:
+                        LOGGER.error(
+                            "Cannot repair dangling link: #%s", target_id
+                        )
                 else:
                     link = model.create_link(
                         element,
@@ -181,6 +198,9 @@ def fix_model(model: loader.MelodyLoader) -> bool:
             if new_value != value.strip():
                 element.attrib[attr] = new_value
                 dirty = True
+
+    for element in marked_for_deletion:
+        element.getparent().remove(element)
 
     return dirty
 
