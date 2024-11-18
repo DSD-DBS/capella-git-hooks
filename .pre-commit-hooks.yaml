@@ -1,7 +1,7 @@
--   id: fix-links
+-   id: fix-capella-fragment-links
     name: fix links after breaking merge
     description: After a breaking merge by the merge tool, this script fixes links starting with index:/.
-    entry: fix-links
+    entry: fix-capella-fragment-links
     language: python
     always_run: true
     stages: [post-commit]

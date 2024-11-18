@@ -4,5 +4,4 @@
 import capella_git_hooks
 
 
-def test_add_some_tests_here():
-    ...
+def test_add_some_tests_here(): ...
