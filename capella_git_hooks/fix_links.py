@@ -134,7 +134,7 @@ def fix_model(model: loader.MelodyLoader) -> bool:
             continue
 
         if element.tag == "semanticResources":
-            if element.text == "":
+            if not element.text:
                 marked_for_deletion.append(element)
                 continue
 
