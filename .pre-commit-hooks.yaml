@@ -8,3 +8,4 @@
   language: python
   always_run: true
   stages: [post-commit]
+  args: [--fix]

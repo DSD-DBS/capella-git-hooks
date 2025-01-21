@@ -12,10 +12,12 @@ __ https://github.com/eclipse/capella/issues/2725
 from __future__ import annotations
 
 import collections.abc as cabc
+import enum
 import logging
 import os
 import pathlib
 import subprocess
+import textwrap
 import typing as t
 import urllib.parse
 
@@ -40,9 +42,11 @@ COMMIT_MSG = "fix[by-script]: merge tool index-prefix"
     ),
     multiple=True,
 )
-@click.option("--no-commit", is_flag=True, help="Do not commit changes.")
+@click.option("--fix", is_flag=True, help="Fix the model(s) if possible")
+@click.option("--no-commit", is_flag=True, help="Do not commit fixed models")
 def main(
     models: cabc.Sequence[str],
+    fix: bool,
     no_commit: bool,
 ):
     """Fix links in all tracked Capella models."""
@@ -62,21 +66,42 @@ def main(
         )
         raise SystemExit(1)
 
+    any_broken = False
     changes = False
     for modelfile in find_tracked_models(models):
         LOGGER.info("Loading model %s", modelfile)
         model = loader.MelodyLoader(modelfile)
-        dirty = fix_model(model)
-        if dirty:
-            LOGGER.info("Saving changes to %s", modelfile)
-            model.resources["\0"] = _IndexWriter()
-            model.save()
-            changes = True
-        else:
-            LOGGER.info("Model is clean, not saving: %s", modelfile)
+        result = fix_model(model)
+
+        match result:
+            case ModelFixResult.NO_CHANGES:
+                LOGGER.info("Model is clean, not saving: %s", modelfile)
+            case ModelFixResult.FIXED:
+                LOGGER.info("Model was fixed: %s", modelfile)
+                changes = True
+            case ModelFixResult.PARTIALLY_FIXED:
+                LOGGER.info("Model was partially fixed: %s", modelfile)
+                changes = any_broken = True
+            case ModelFixResult.BROKEN:
+                LOGGER.info("No fixes available for model: %s", modelfile)
+                any_broken = True
+            case _:
+                raise AssertionError("non-exhaustive match")
+
+        if result in (ModelFixResult.FIXED, ModelFixResult.PARTIALLY_FIXED):
+            if fix:
+                changes = True
+                LOGGER.info("Saving changes to %s", modelfile)
+                if not no_commit:
+                    model.resources["\0"] = _IndexWriter()
+                model.save()
+            else:
+                LOGGER.info("Not saving model without --fix")
 
     if changes:
-        if no_commit:
+        if not fix:
+            LOGGER.info("Not committing changes without --fix")
+        elif no_commit:
             LOGGER.info("Not committing changes (--no-commit)")
         else:
             LOGGER.info("Committing changes")
@@ -84,6 +109,40 @@ def main(
                 ["git", "commit", "-m", COMMIT_MSG],
                 env=os.environ | {"SKIP": "fix-capella-fragment-links"},
             )
+
+    if any_broken:
+        status = 2
+        text = """\
+            \x1b[91m********************************************************************************\x1b[m
+
+            The model is broken, in a way we can't fix automatically!
+            Please contact your tools team to get assistance in repairing it.
+
+            \x1b[91m********************************************************************************\x1b[m
+            """
+    elif changes:
+        status = 1
+        text = """\
+            \x1b[93m********************************************************************************\x1b[m
+
+            The model was broken, but some automatic fixes have been applied.
+            Please verify that these changes are correct before pushing them.
+            Contact your tools team if you need further assistance.
+
+            \x1b[93m********************************************************************************\x1b[m
+            """
+    else:
+        status = 0
+        text = """\
+            \x1b[92m********************************************************************************\x1b[m
+
+            It looks like your model is fine!
+
+            \x1b[92m********************************************************************************\x1b[m
+            """
+
+    click.echo("\n" + textwrap.dedent(text).strip(), err=True)
+    raise SystemExit(status)
 
 
 def find_tracked_models(models: cabc.Sequence[str]) -> cabc.Iterable[str]:
@@ -117,15 +176,10 @@ def is_file_dirty(path: pathlib.PurePosixPath) -> bool:
     return p.returncode != 0
 
 
-def fix_model(model: loader.MelodyLoader) -> bool:
-    """Fix the links in the provided model.
-
-    Returns
-    -------
-    bool
-        True if the model was modified, False otherwise.
-    """
+def fix_model(model: loader.MelodyLoader) -> ModelFixResult:
+    """Fix the links in the provided model."""
     dirty = False
+    broken = False
     marked_for_deletion: list[etree._Element] = []
     for element in model.iterall():
         try:
@@ -186,6 +240,7 @@ def fix_model(model: loader.MelodyLoader) -> bool:
                         LOGGER.error(
                             "Cannot repair dangling link: #%s", target_id
                         )
+                        broken = True
                 else:
                     link = model.create_link(
                         element,
@@ -202,7 +257,28 @@ def fix_model(model: loader.MelodyLoader) -> bool:
     for element in marked_for_deletion:
         element.getparent().remove(element)
 
-    return dirty
+    match (dirty, broken):
+        case (False, False):
+            return ModelFixResult.NO_CHANGES
+        case (False, True):
+            return ModelFixResult.BROKEN
+        case (True, False):
+            return ModelFixResult.FIXED
+        case (True, True):
+            return ModelFixResult.PARTIALLY_FIXED
+        case _:
+            raise AssertionError("invalid match/case")
+
+
+class ModelFixResult(enum.Enum):
+    NO_CHANGES = enum.auto()
+    """The model was fine, no changes were made."""
+    FIXED = enum.auto()
+    """Fixes were applied to the model, and it's fine now."""
+    PARTIALLY_FIXED = enum.auto()
+    """Some issues were fixed, but the model is still broken."""
+    BROKEN = enum.auto()
+    """No fixes were applied, and the model is broken."""
 
 
 class EverythingContainer(cabc.Container):
