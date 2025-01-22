@@ -59,24 +59,13 @@ def main(
     """Fix links in all tracked Capella models."""
     logging.basicConfig(level="INFO")
 
-    dirty_files = (
-        subprocess.check_output(
-            ["git", "diff", "--name-only", "-z"], text=True
-        )
-        .rstrip("\0")
-        .split("\0")
-    )
-    if dirty_files != [""]:
-        LOGGER.error(
-            "Worktree is dirty, commit or stash changes and try again: %s",
-            dirty_files,
-        )
-        raise SystemExit(1)
+    if not models:
+        models = list(find_tracked_models())
 
     any_broken = False
     changes = False
-    for modelfile in find_tracked_models(models):
-        LOGGER.info("Loading model %s", modelfile)
+    for modelfile in models:
+        LOGGER.info("Loading model from file %s", modelfile)
         model = loader.MelodyLoader(modelfile)
         result = fix_model(model)
 
@@ -152,7 +141,7 @@ def main(
     raise SystemExit(status)
 
 
-def find_tracked_models(models: cabc.Sequence[str]) -> cabc.Iterable[str]:
+def find_tracked_models() -> cabc.Iterable[str]:
     """Find all tracked models in the current Git repository.
 
     If a list of models is provided, filter the result to only include
@@ -162,15 +151,10 @@ def find_tracked_models(models: cabc.Sequence[str]) -> cabc.Iterable[str]:
     directory. Any provided models that live outside of the CWD are
     ignored.
     """
-    if not models:
-        filter: cabc.Container = EverythingContainer()
-    else:
-        filter = [os.path.relpath(m) for m in models]
-
     for file in subprocess.check_output(
         ["git", "ls-files", "-cz"], text=True
     ).split("\0"):
-        if file.endswith(".aird") and file in filter:
+        if file.endswith(".aird"):
             yield file
 
 
