@@ -26,8 +26,6 @@ from capellambse import filehandler, helpers, loader
 from lxml import etree
 
 LOGGER = logging.getLogger(__name__)
-# FIXME This isn't conventional-commits compliant, and might fail checks
-COMMIT_MSG = "fix[by-script]: merge tool index-prefix"
 
 
 @click.command()
@@ -44,10 +42,18 @@ COMMIT_MSG = "fix[by-script]: merge tool index-prefix"
 )
 @click.option("--fix", is_flag=True, help="Fix the model(s) if possible")
 @click.option("--no-commit", is_flag=True, help="Do not commit fixed models")
+@click.option(
+    "-m",
+    "--commit-message",
+    # FIXME This isn't conventional-commits compliant, and might fail checks
+    default="fix[by-script]: merge tool index-prefix",
+    help="Commit message to use when committing fixed models",
+)
 def main(
     models: cabc.Sequence[str],
     fix: bool,
     no_commit: bool,
+    commit_message: str,
 ):
     """Fix links in all tracked Capella models."""
     logging.basicConfig(level="INFO")
@@ -106,7 +112,7 @@ def main(
         else:
             LOGGER.info("Committing changes")
             subprocess.call(
-                ["git", "commit", "-m", COMMIT_MSG],
+                ["git", "commit", "-m", commit_message],
                 env=os.environ | {"SKIP": "fix-capella-fragment-links"},
             )
 
