@@ -4,8 +4,10 @@
 name: Docs
 
 on:
+  pull_request:
   push:
-    branches: ["master"]
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   sphinx:
@@ -33,6 +35,7 @@ jobs:
         run: |
           make -C docs html
       - name: Deploy
+        if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           force_orphan: true

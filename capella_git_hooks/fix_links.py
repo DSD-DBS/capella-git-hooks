@@ -1,4 +1,4 @@
-# Copyright DB Netz AG and contributors
+# Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 """A script which fixes broken links within Capella models.
 
@@ -50,11 +50,12 @@ LOGGER = logging.getLogger(__name__)
     help="Commit message to use when committing fixed models",
 )
 def main(
+    *,
     models: cabc.Sequence[str],
     fix: bool,
     no_commit: bool,
     commit_message: str,
-):
+) -> None:
     """Fix links in all tracked Capella models."""
     logging.basicConfig(level="INFO")
 
@@ -317,7 +318,7 @@ class _IndexFile(t.BinaryIO):
     def __init__(self, path: pathlib.PurePosixPath) -> None:
         # pylint: disable=consider-using-with
         self.__path = path
-        self.__file = open(path, "wb")
+        self.__file = open(path, "wb")  # noqa: SIM115
         self.__is_open = True
 
     @property
@@ -335,7 +336,9 @@ class _IndexFile(t.BinaryIO):
             import warnings
 
             warnings.warn(
-                "IndexFile should be closed explicitly", ResourceWarning
+                "IndexFile should be closed explicitly",
+                ResourceWarning,
+                stacklevel=2,
             )
             self.close()
 
