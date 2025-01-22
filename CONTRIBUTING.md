@@ -15,7 +15,6 @@ issue]. Or go ahead and [open a pull request] to contribute code. In order to
 reduce the burden on our maintainers, please make sure that your code follows
 our style guidelines outlined below.
 
-<!-- prettier-ignore -->
 [open an issue]: https://github.com/DSD-DBS/capella-git-hooks/issues
 [open a pull request]: https://github.com/DSD-DBS/capella-git-hooks/pulls
 
@@ -66,8 +65,7 @@ The key differences are:
 
 - **Docstrings**: The [Numpy style guide] applies here.
 
-  [numpy style guide]:
-    https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
+  [numpy style guide]: https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
 
   When writing docstrings for functions, use the imperative style, as per
   [PEP-257]. For example, write "Do X and Y" instead of "Does X and Y".
@@ -105,8 +103,6 @@ The key differences are:
 - **Typing**: We do not make an exception for `typing` imports. Instead of
   writing `from typing import SomeName`, use `import typing as t` and access
   typing related classes like `t.TypedDict`.
-
-  <!-- prettier-ignore -->
 
   Use the new syntax and classes for typing introduced with Python 3.10.
 
