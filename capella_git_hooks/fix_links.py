@@ -246,7 +246,9 @@ def fix_model(model: loader.MelodyLoader) -> ModelFixResult:
                 dirty = True
 
     for element in marked_for_deletion:
-        element.getparent().remove(element)
+        parent = element.getparent()
+        assert parent is not None
+        parent.remove(element)
 
     match (dirty, broken):
         case (False, False):

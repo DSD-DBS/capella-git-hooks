@@ -113,6 +113,7 @@ repos:
       - id: mypy
         additional_dependencies:
           - capellambse==0.6.10
+          - types-lxml==2024.04.14
   - repo: https://github.com/fsfe/reuse-tool
     rev: v5.0.2
     hooks:
