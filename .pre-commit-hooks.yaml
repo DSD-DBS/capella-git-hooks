@@ -1,7 +1,10 @@
--   id: fix-capella-fragment-links
-    name: fix links after breaking merge
-    description: After a breaking merge by the merge tool, this script fixes links starting with index:/.
-    entry: fix-capella-fragment-links
-    language: python
-    always_run: true
-    stages: [post-commit]
+# Copyright DB Netz AG and contributors
+# SPDX-License-Identifier: CC0-1.0
+
+- id: fix-capella-fragment-links
+  name: fix links after breaking merge
+  description: After a breaking merge by the merge tool, this script fixes links starting with index:/.
+  entry: fix-capella-fragment-links
+  language: python
+  always_run: true
+  stages: [post-commit]
