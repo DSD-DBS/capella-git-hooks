@@ -1,0 +1,7 @@
+capella-git-hooks
+=================
+
+.. toctree::
+   :maxdepth: 4
+
+   capella_git_hooks

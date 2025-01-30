@@ -1,0 +1,21 @@
+capella\_git\_hooks package
+===========================
+
+Submodules
+----------
+
+capella\_git\_hooks.fix\_links module
+-------------------------------------
+
+.. automodule:: capella_git_hooks.fix_links
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: capella_git_hooks
+   :members:
+   :undoc-members:
+   :show-inheritance:
