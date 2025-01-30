@@ -34,7 +34,7 @@ dependencies = [
 ]
 
 [project.scripts]
-fix-capella-fragment-links = "capella_git_hooks.fix_links:main"
+capella-link-check = "capella_git_hooks.fix_links:main"
 
 [project.urls]
 Homepage = "https://github.com/DSD-DBS/capella-git-hooks"
